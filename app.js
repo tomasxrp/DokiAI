@@ -1,4 +1,6 @@
 import { MLCEngine } from "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.78/lib/index.min.js";
+import { reproducirVoz } from "./pruebaApi.js";
+
 
     const chatBox = document.getElementById("chat");
     const input = document.getElementById("user-input");
@@ -39,7 +41,6 @@ Tu límite son 400 caracteres.
 `
     };
 
-    // Historial de conversación
     const chatHistory = [systemPrompt];
 
     const appendMsg = (role, content) => {
@@ -63,27 +64,29 @@ Tu límite son 400 caracteres.
       if (!userText) return;
       appendMsg("Tú", userText);
       input.value = "";
-
+    
       chatHistory.push({ role: "user", content: userText });
       appendMsg("Bot", "Pensando...");
-
+    
       try {
         const stream = await engine.chat.completions.create({
           messages: chatHistory,
           model: model,
           stream: true,
         });
-
+    
         let botMsg = "";
         for await (const response of stream) {
           for (const choice of response.choices) {
             botMsg += choice.delta.content || "";
-            chatBox.lastChild.textContent = `Bot: ${botMsg}`;
           }
         }
-
+    
         chatHistory.push({ role: "assistant", content: botMsg });
-
+    
+        await reproducirVoz(botMsg);
+        chatBox.lastChild.textContent = `Bot: ${botMsg}`;
+    
       } catch (e) {
         chatBox.lastChild.textContent = "Bot: (Error al responder)";
         console.error(e);
