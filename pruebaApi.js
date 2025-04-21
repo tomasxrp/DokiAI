@@ -1,13 +1,12 @@
 async function reproducirVoz(textoIngresado) {
-    const texto = textoIngresado;
     const speaker = 1;
 
-    const queryResponse = await fetch(`http://localhost:50021/audio_query?text=${encodeURIComponent(texto)}&speaker=${speaker}`, {
+    const queryResponse = await fetch(`http://localhost:50021/audio_query?text=${encodeURIComponent(textoIngresado)}&speaker=${speaker}`, {
         method: 'POST'
     });
 
     const audioQuery = await queryResponse.json();
-    audioQuery.speedScale = 2.0; 
+    audioQuery.speedScale = 1.0; 
     
     const synthesisResponse = await fetch(`http://localhost:50021/synthesis?speaker=${speaker}`, {
         method: 'POST',

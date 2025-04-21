@@ -1,5 +1,6 @@
 import { MLCEngine } from "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.78/lib/index.min.js";
 import { reproducirVoz } from "./pruebaApi.js";
+import { traducir } from "./traductor.js";
 
 
     const chatBox = document.getElementById("chat");
@@ -83,8 +84,11 @@ Tu límite son 400 caracteres.
         }
     
         chatHistory.push({ role: "assistant", content: botMsg });
+
+        let msgTraducido = await traducir(botMsg, "es", "ja");
+        console.log(msgTraducido);
     
-        await reproducirVoz(botMsg);
+        await reproducirVoz(msgTraducido);
         chatBox.lastChild.textContent = `Bot: ${botMsg}`;
     
       } catch (e) {
