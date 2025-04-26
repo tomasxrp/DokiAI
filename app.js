@@ -6,11 +6,18 @@ import { traducir } from "./traductor.js";
     const chatBox = document.getElementById("chat");
     const input = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
+    const micBtn = document.getElementById("mic-btn");
+    const stopBtn = document.getElementById("stop-btn");
+    const pruebaBtn = document.getElementById("prueba-btn");
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.lang = "es-ES";
+    recognition.interimResult = false;
 
     let engine;
     const model = "Llama-3.2-3B-Instruct-q4f16_1-MLC";
 
-    // Prompt para que actúe como un personaje
     const systemPrompt = {
       role: "system",
       content: `
@@ -43,6 +50,60 @@ Tu límite son 400 caracteres.
     };
 
     const chatHistory = [systemPrompt];
+    let recognizedText = "";
+
+    const saveChatHistory = () => {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    };
+
+    const loadChatHistory = () => {
+      const savedHistory = localStorage.getItem("chatHistory");
+      chatHistory.length = 0; 
+      chatHistory.push(systemPrompt);
+    
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory);
+        parsedHistory.forEach((msg) => {
+          if (msg.role !== "system") { 
+            chatHistory.push(msg);
+          }
+        });
+      }
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript; 
+      recognizedText = transcript; 
+    };
+
+    recognition.onend = () => {
+      console.log("Reconocimiento de voz detenido.");
+    };
+    
+
+    micBtn.addEventListener('click', () => {
+      micBtn.style.display = "none";
+      stopBtn.style.display = "block";
+      recognition.start();
+    });
+    
+    stopBtn.addEventListener('click', () => {
+      micBtn.style.display = "block";
+      stopBtn.style.display = "none";
+      recognition.stop();
+      
+      setTimeout(() => {
+        console.log("Texto reconocido:", recognizedText.trim());
+        sendRecognizedMessage();
+        recognizedText = "";
+      }, 500);
+    });
+
+    
+    recognition.onerror = (event) => {
+      console.error("Error en el reconocimiento de voz:", event.error);
+    };
+
 
     const appendMsg = (role, content) => {
       const div = document.createElement("div");
@@ -67,6 +128,7 @@ Tu límite son 400 caracteres.
       input.value = "";
     
       chatHistory.push({ role: "user", content: userText });
+      saveChatHistory();
       appendMsg("Bot", "Pensando...");
     
       try {
@@ -97,7 +159,44 @@ Tu límite son 400 caracteres.
       }
     };
 
+    const sendRecognizedMessage = async () => {
+      const userText = recognizedText.trim();
+      if (!userText) return; // No enviar si no hay texto reconocido
+    
+      appendMsg("Tú", userText);
+      chatHistory.push({ role: "user", content: userText });
+      saveChatHistory();
+      appendMsg("Bot", "Pensando...");
+    
+      try {
+        const stream = await engine.chat.completions.create({
+          messages: chatHistory,
+          model: model,
+          stream: true,
+        });
+    
+        let botMsg = "";
+        for await (const response of stream) {
+          for (const choice of response.choices) {
+            botMsg += choice.delta.content || "";
+          }
+        }
+    
+        chatHistory.push({ role: "assistant", content: botMsg });
+    
+        let msgTraducido = await traducir(botMsg, "es", "ja");
+        console.log(msgTraducido);
+    
+        await reproducirVoz(msgTraducido);
+        chatBox.lastChild.textContent = `Bot: ${botMsg}`;
+      } catch (e) {
+        chatBox.lastChild.textContent = "Bot: (Error al responder)";
+        console.error(e);
+      }
+    };
+
     sendBtn.onclick = sendMessage;
     input.onkeydown = (e) => { if (e.key === "Enter") sendMessage(); };
 
     loadModel();
+    loadChatHistory();

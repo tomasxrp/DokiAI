@@ -13,17 +13,17 @@
 </head>
 <body class="bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 min-h-screen flex items-center justify-center p-4">
 
-  <div class="w-full max-w-6xl bg-white bg-opacity-70 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row sm:flex flex-col">
+  <div class="w-full max-w-6xl bg-white bg-opacity-70 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row sm:flex-col">
     
-  
-    <div class="md:w-1/2 w-full h-auto md:h-auto flex items-center justify-center bg-pink-100">
+    <!-- Imagen del personaje -->
+    <div class="w-full h-auto flex items-center justify-center bg-pink-100">
       <img src="foto.png" 
            alt="AI Chat Anime" 
-           class="object-cover w-3/4 h-full md:rounded-l-3xl md:rounded-r-none rounded-t-3xl md:rounded-t-none">
+           class="object-cover w-3/4 h-full rounded-t-3xl md:rounded-l-3xl md:rounded-r-none md:rounded-t-none">
     </div>
 
-    
-    <div class="md:w-1/2 w-full p-6 flex flex-col justify-between">
+    <!-- Contenedor del chat -->
+    <div class="w-full p-6 flex flex-col justify-between">
       <div>
         <h1 class="text-3xl font-bold text-center text-purple-600 mb-6">🤖✨ Chat con WebLLM</h1>
 
@@ -40,15 +40,22 @@
           class="flex-1 px-4 py-2 rounded-full border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
         >
         <button 
-          id="send-btn" 
-          class="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-full transition font-semibold shadow"
+          id="mic-btn" 
+          class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full transition font-semibold shadow"
         >
+          🎤
+        </button>
+        <button 
+          id="stop-btn" 
+          class="bg-pink-500 visibility: hidden hover:bg-pink-600 text-white px-5 py-2 rounded-full transition font-semibold shadow"
+        >
+          ⏸️
+        </button>
+        <button id="send-btn" class="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-full transition font-semibold shadow">
           Enviar
         </button>
       </div>
     </div>
-
-    <button onclick=""></button>
   </div>
 
   <script type="module" src="app.js"></script>
