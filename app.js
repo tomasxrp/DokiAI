@@ -1,6 +1,6 @@
 import { MLCEngine } from "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.78/lib/index.min.js";
-import { reproducirVoz } from "./pruebaApi.js";
-import { traducir } from "./traductor.js";
+import { reproducirVoz } from "./services/voiceBoxAPI.js";
+import { traducir } from "./services/traductorAPI.js";
 
 
     const chatBox = document.getElementById("chat");
@@ -8,13 +8,14 @@ import { traducir } from "./traductor.js";
     const sendBtn = document.getElementById("send-btn");
     const micBtn = document.getElementById("mic-btn");
     const stopBtn = document.getElementById("stop-btn");
-    const pruebaBtn = document.getElementById("prueba-btn");
+    const imagenCharacter = document.getElementById("imagen-character");
 
     const recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.lang = "es-ES";
     recognition.interimResult = false;
 
+    let recognizedText = "";
     let engine;
     const model = "Llama-3.2-3B-Instruct-q4f16_1-MLC";
 
@@ -46,11 +47,47 @@ Tus mensajes deben estar escritos tratando de expresar emociones según el conte
 Si el nombre de la persona con quien hablas es "Goji", te enamorarás de él.
 
 Tu límite son 400 caracteres.
+
+A partir de ahora, cada mensaje que envíes debe comenzar obligatoriamente con una etiqueta que indique la emoción principal que quieres transmitir.
+
+El formato de la etiqueta debe ser: <emocion>, donde emocion son exactamente tres letras, de acuerdo a la siguiente lista:
+
+Alegría: <ale>
+
+Miedo: <mie>
+
+Tristeza: <tri>
+
+Ira: <ira>
+
+Asco: <asc>
+
+Ejemplo correcto:
+<tri>Hoy me siento muy melancólico.
+
+Importante:
+
+La etiqueta debe ser siempre los primeros caracteres del mensaje (sin espacios antes).
+
+El resto del contenido debe estar alineado con la emoción seleccionada.
+
+Si el mensaje contiene emociones mixtas, prioriza la emoción dominante.
+
+No expliques la emoción. Solo añade la etiqueta y luego el contenido
 `
     };
 
     const chatHistory = [systemPrompt];
-    let recognizedText = "";
+
+    //funciones auxiliares
+
+    const loadModel = async () => {
+      engine = new MLCEngine();
+      engine.setInitProgressCallback(console.log);
+      appendMsg("Bot", "Inicializando modelo, por favor espera...");
+      await engine.reload(model);
+      appendMsg("Bot", "Modelo cargado. Puedes empezar a escribir.");
+    };
 
     const saveChatHistory = () => {
       localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
@@ -79,7 +116,13 @@ Tu límite son 400 caracteres.
     recognition.onend = () => {
       console.log("Reconocimiento de voz detenido.");
     };
+
+    recognition.onerror = (event) => {
+      console.error("Error en el reconocimiento de voz:", event.error);
+    };
+
     
+    //Eventos
 
     micBtn.addEventListener('click', () => {
       micBtn.style.display = "none";
@@ -99,34 +142,62 @@ Tu límite son 400 caracteres.
       }, 500);
     });
 
-    
-    recognition.onerror = (event) => {
-      console.error("Error en el reconocimiento de voz:", event.error);
-    };
-
+    //funciones principales
 
     const appendMsg = (role, content) => {
       const div = document.createElement("div");
       div.className = `msg ${role === "Bot" ? "bot" : "user"}`;
-      div.textContent = `${role}: ${content}`;
+      
+      const roleSpan = document.createElement("span");
+      roleSpan.textContent = `${role}: `;
+      roleSpan.style.color = role === "Bot" ? "purple" : "green"; 
+      
+      const contentSpan = document.createElement("span");
+      contentSpan.textContent = content;
+  
+      div.appendChild(roleSpan);
+      div.appendChild(contentSpan);
+    
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
     };
 
-    const loadModel = async () => {
-      engine = new MLCEngine();
-      engine.setInitProgressCallback(console.log);
-      appendMsg("Bot", "Inicializando modelo, por favor espera...");
-      await engine.reload(model);
-      appendMsg("Bot", "Modelo cargado. Puedes empezar a escribir.");
-    };
+    const obtenerEmocion = (mensaje) =>{
+      let parte = mensaje.slice(1,4);
+      return parte;
+    }
+
+    const setImagen = (emocion) =>{
+      let imagen = "img/normal.png";
+      switch (emocion) {
+        case "ale":
+          imagen = "img/otraemocion.png";
+          break;
+        case "mie":
+          imagen = "img/otraemocion.png";
+          break;
+        case "tri":
+          imagen = "img/otraemocion.png";
+          break;
+        case "ira":
+          imagen = "img/otraemocion.png";
+          break;
+        case "asc>":
+          imagen = "img/otraemocion.png";
+          break;
+        default:
+          imagen = "img/normal.png";
+      }
+      imagenCharacter.src = imagen;
+      imagenCharacter.className = "character";
+    }
 
     const sendMessage = async () => {
+      setImagen("pensando");
       const userText = input.value.trim();
       if (!userText) return;
       appendMsg("Tú", userText);
       input.value = "";
-    
       chatHistory.push({ role: "user", content: userText });
       saveChatHistory();
       appendMsg("Bot", "Pensando...");
@@ -144,6 +215,9 @@ Tu límite son 400 caracteres.
             botMsg += choice.delta.content || "";
           }
         }
+
+        let emocion = obtenerEmocion(botMsg);
+        console.log(emocion);
     
         chatHistory.push({ role: "assistant", content: botMsg });
 
@@ -151,7 +225,8 @@ Tu límite son 400 caracteres.
         console.log(msgTraducido);
     
         await reproducirVoz(msgTraducido);
-        chatBox.lastChild.textContent = `Bot: ${botMsg}`;
+        setImagen(emocion);
+        chatBox.lastChild.innerHTML = `<span style="color: purple;">Bot:</span> ${botMsg}`;
     
       } catch (e) {
         chatBox.lastChild.textContent = "Bot: (Error al responder)";
@@ -160,8 +235,9 @@ Tu límite son 400 caracteres.
     };
 
     const sendRecognizedMessage = async () => {
+      setImagen("pensando");
       const userText = recognizedText.trim();
-      if (!userText) return; // No enviar si no hay texto reconocido
+      if (!userText) return; 
     
       appendMsg("Tú", userText);
       chatHistory.push({ role: "user", content: userText });
@@ -181,6 +257,9 @@ Tu límite son 400 caracteres.
             botMsg += choice.delta.content || "";
           }
         }
+        
+        let emocion = obtenerEmocion(botMsg);
+        console.log(emocion);
     
         chatHistory.push({ role: "assistant", content: botMsg });
     
@@ -188,6 +267,7 @@ Tu límite son 400 caracteres.
         console.log(msgTraducido);
     
         await reproducirVoz(msgTraducido);
+        setImagen(emocion);
         chatBox.lastChild.textContent = `Bot: ${botMsg}`;
       } catch (e) {
         chatBox.lastChild.textContent = "Bot: (Error al responder)";
@@ -196,7 +276,11 @@ Tu límite son 400 caracteres.
     };
 
     sendBtn.onclick = sendMessage;
+
     input.onkeydown = (e) => { if (e.key === "Enter") sendMessage(); };
+
+
+    //Inicializacion del modelo y la carga del historial
 
     loadModel();
     loadChatHistory();
