@@ -1,3 +1,5 @@
+EL USO QUE SE LE DE A LA IA ES DE ESTRICTA RESPONSABILIDAD DEL USUARIO
+
 ------------------Pasos para ejecutar el programa:------------------
 1. Instalar python desde la pagina oficial
 https://www.python.org/downloads/
