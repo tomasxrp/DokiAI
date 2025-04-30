@@ -19,56 +19,58 @@
       }
 
       .character {
-        max-height: 400px;
-        width: 20rem; 
-        margin-bottom: 1.5rem;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1)) 
-                drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06)); 
-  }
+          max-height: 700px;
+          width: 40rem;
+          margin-bottom: 10.7rem;
+          filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1))
+                  drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
+          
+          /* Equivalentes Tailwind */
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 10;
+          pointer-events: none;
+        }
     </style>
   </head>
-<body class="h-screen flex flex-col justify-between bg-cover bg-center" style="background-image: url('https://wallpapers.com/images/hd/anime-landscape-evening-sky-8s178qs7w9oa66go.jpg');">
-  
-  <!-- Contenedor principal -->
-  <div class="flex flex-col justify-end flex-grow items-center px-4 pb-12">
-    
-    <!-- Imagen del personaje -->
-    <img id="imagen-character" src="img/normal.png" alt="Personaje" class="character">
-    
-    <!-- Cuadro de diálogo -->
-     <div class="w-full max-w-2xl">
-      <div class="w-1/4 bg-pink-200 border-2 border-pink-300 rounded-lg py-2 text-center shadow-lg">
-        <span class="text-center font-bold">Kurisu</span>
-      </div>
-      <div id="chat" class="w-full max-w-2xl h-32 bg-pink-100 rounded-lg p-4 text-gray-800 mb-4 resize-none shadow-lg overflow-y-auto" 
-     style="background-image: url('https://previews.123rf.com/images/perekotypole/perekotypole1606/perekotypole160600092/59798074-fondo-de-la-acuarela-de-color-rosa-con-c%C3%ADrculos-blancos.jpg'); 
-            background-size: cover; 
-            background-position: center; 
-            background-color: rgba(222, 215, 255, 0.8); 
-            background-blend-mode: overlay;">
-      </div>
-    </div>
-    
-  </div>
-  
-  <!-- Input de mensaje y botones -->
-  <div class="w-full flex justify-center mb-6">
-    <div class="w-3/4 bg-white/70 p-4 flex items-center space-x-2 rounded-lg shadow-md">
-      <input id="user-input" type="text" placeholder="Escribe un mensaje..." class="flex-1 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400">
-      
-      <button id="mic-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg">
-        🎤
-      </button>
+  <body class="h-screen w-full flex flex-col justify-between bg-cover bg-center relative" 
+  style="background-image: url('img/background.png');">
 
-	<button id="stop-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg hidden">
-        ⏸️
-      </button>
-      
-      <button id="send-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg">
-        ➤
-      </button>
+      <!-- Imagen del personaje como fondo -->
+      <img id="imagen-character" src="img/normal.png" alt="Personaje" 
+        class="character">
+
+      <!-- Contenedor principal -->
+      <div class="flex flex-col justify-end flex-grow items-center px-4 pb-12 relative z-20">
+
+      <!-- Contenedor del nombre y chat -->
+      <div class="w-full max-w-4xl mx-auto">
+        <div class="w-1/4 bg-pink-200 border-2 border-pink-300 rounded-lg py-2 text-center shadow-lg mb-2">
+          <span class="text-center font-bold">Monika</span>
+        </div>
+        <div id="chat" class="w-full  h-36 bg-pink-100 rounded-lg p-4 text-gray-800 mb-4 resize-none shadow-lg overflow-y-auto" 
+        style="background-image: url('img/fondochat.png'); 
+                background-size: cover; 
+                background-position: center; 
+                background-color: rgba(222, 215, 255, 0.2); 
+                background-blend-mode: overlay;">
+        </div>
+      </div>
+      </div>
+
+      <!-- Input de mensaje y botones -->
+      <div class="w-full flex justify-center mb-6 relative z-20">
+      <div class="w-full max-w-4xl bg-white/70 p-4 flex items-center space-x-2 rounded-lg shadow-md">
+        <input id="user-input" type="text" placeholder="Escribe un mensaje..." 
+              class="flex-1 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400">
+        
+        <button id="mic-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg">🎤</button>
+        <button id="stop-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg hidden">⏸️</button>
+        <button id="send-btn" class="bg-pink-400 hover:bg-pink-500 text-white p-3 rounded-lg">➤</button>
+      </div>
     </div>
-  </div>
-  <script type="module" src="app.js"></script>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
