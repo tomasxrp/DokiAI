@@ -16,7 +16,7 @@ carpeta raiz del proyecto.
 generar las voces del chat AI
 
 (NO SE DEBE CERRAR CUANDO ESTES OCUPANDO EL PROGRAMA, YA QUE DARA ERROR
-AL ENTREGAR RESPUESTAS Y REPRODICIR LOS AUDIOS)
+AL ENTREGAR RESPUESTAS Y REPRODUCIR LOS AUDIOS)
 
 5.Doble click en el archivo ejecutarServer.bat, el cual es el encargado de
 levantar un servidor local para poder usar el programa.
