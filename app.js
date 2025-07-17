@@ -247,6 +247,7 @@ No expliques la emoción. Solo añade la etiqueta y luego el contenido
     
         await reproducirVoz(msgTraducido);
         setImagen(emocion);
+        botMsg = botMsg.slice(5, -1);
         chatBox.lastChild.innerHTML = `<span style="color: purple;">Bot:</span> ${botMsg}`;
     
       } catch (e) {
